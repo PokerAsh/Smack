@@ -2,17 +2,20 @@ package com.yernarkt.smack.controller
 
 import android.graphics.Color
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.yernarkt.smack.R
-import com.yernarkt.smack.network.ServiceGenerator
+import com.yernarkt.smack.volley_network.AuthService
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import java.util.*
 
 class SignUpActivity : AppCompatActivity() {
-
     var userAvatar = "profileDefault"
     var avatarColor = "[0.5, 0.5, 0.5, 1]"
+
+    lateinit var email: String
+    lateinit var password: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +49,18 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     fun createUserBtnClick(view: View) {
+        email = createEmailText.text.toString()
+        password = createPasswordText.text.toString()
 
+        if (email != "" || password != "")
+            AuthService.registerUser(this, email, password) { complete ->
+                if (complete) {
+                    Snackbar.make(view, "YEY", Snackbar.LENGTH_LONG).show()
+                } else {
+                    Snackbar.make(view, "Error", Snackbar.LENGTH_LONG).show()
+                }
+            }
+        else
+            Snackbar.make(view, "Please enter email and password", Snackbar.LENGTH_LONG).show()
     }
 }
