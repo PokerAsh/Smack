@@ -49,20 +49,26 @@ class SignUpActivity : AppCompatActivity() {
         val userName = createUserNameText.text.toString()
         val email = createEmailText.text.toString()
         val password = createPasswordText.text.toString()
+//        val
 
-        if (email != "" || password != "")
-            AuthService.registerUser(this, email, password) { registerSuccess ->
-                if (registerSuccess) {
-                    AuthService.loginUser(this, email, password){loginSuccess ->
-                        if(loginSuccess){
-                            Snackbar.make(view, "YEY", Snackbar.LENGTH_LONG).show()
+//        if (email != "" || password != "")
+        AuthService.registerUser(this, email, password) { registerSuccess ->
+            if (registerSuccess) {
+                AuthService.loginUser(this, email, password) { loginSuccess ->
+                    if (loginSuccess) {
+                        AuthService.createUser(this, userName, email, userAvatar, avatarColor){createUserSuccess ->
+                            if(createUserSuccess){
+                                finish()
+                            }
                         }
                     }
-                } else {
-                    Snackbar.make(view, "Error", Snackbar.LENGTH_LONG).show()
                 }
+            } else {
+                Snackbar.make(view, "Error", Snackbar.LENGTH_LONG).show()
             }
-        else
-            Snackbar.make(view, "Please enter email and password", Snackbar.LENGTH_LONG).show()
+        }
+
+//        else
+//            Snackbar.make(view, "Please enter email and password", Snackbar.LENGTH_LONG).show()
     }
 }
