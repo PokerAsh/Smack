@@ -24,7 +24,7 @@
             android:id="@+id/messageTextField" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="8dp"
-            app:layout_constraintBottom_toBottomOf="parent" tools:text="message:"/>
+            app:layout_constraintBottom_toBottomOf="parent" android:hint="message:"/>
     <ImageButton
             android:layout_width="36dp"
             android:layout_height="36dp" app:srcCompat="@drawable/ic_menu_send"
