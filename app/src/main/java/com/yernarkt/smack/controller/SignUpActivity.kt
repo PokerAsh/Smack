@@ -91,12 +91,12 @@ class SignUpActivity : AppCompatActivity() {
             Snackbar.make(view, "Please enter username, email and password", Snackbar.LENGTH_LONG).show()
     }
 
-    fun errorSnackBar(view: View) {
+    private fun errorSnackBar(view: View) {
         enableProgressBar(false)
         Snackbar.make(view, "Something went wrong. Please try again", Snackbar.LENGTH_LONG).show()
     }
 
-    fun enableProgressBar(enable: Boolean) {
+    private fun enableProgressBar(enable: Boolean) {
         if (enable) {
             createPb.visibility = VISIBLE
         } else {
