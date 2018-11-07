@@ -1,9 +1,11 @@
-package com.yernarkt.smack
+package com.yernarkt.smack.controller
 
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.yernarkt.smack.R
+import com.yernarkt.smack.network.ServiceGenerator
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import java.util.*
 
