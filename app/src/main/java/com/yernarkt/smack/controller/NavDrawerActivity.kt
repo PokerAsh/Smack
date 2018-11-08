@@ -15,11 +15,14 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.yernarkt.smack.R
+import com.yernarkt.smack.model.Channel
 import com.yernarkt.smack.util.BROADCAST_USER_DATA_CHANGE
 import com.yernarkt.smack.util.SOCKET_URL
 import com.yernarkt.smack.vnetwork.AuthService
+import com.yernarkt.smack.vnetwork.MessageService
 import com.yernarkt.smack.vnetwork.UserDataService
 import io.socket.client.IO
+import io.socket.emitter.Emitter
 import kotlinx.android.synthetic.main.activity_nav_drawer.*
 import kotlinx.android.synthetic.main.app_bar_nav_drawer.*
 import kotlinx.android.synthetic.main.nav_header_nav_drawer.*
@@ -39,6 +42,9 @@ class NavDrawerActivity : AppCompatActivity() {
         )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
+
+        socket.connect()
+        socket.on("channelCreated", onNewChannel)
     }
 
     override fun onResume() {
@@ -47,16 +53,11 @@ class NavDrawerActivity : AppCompatActivity() {
                 BROADCAST_USER_DATA_CHANGE
             )
         )
-        socket.connect()
         super.onResume()
     }
 
-    override fun onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChangeReceiver)
-        super.onPause()
-    }
-
     override fun onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChangeReceiver)
         socket.disconnect()
         super.onDestroy()
     }
@@ -110,6 +111,20 @@ class NavDrawerActivity : AppCompatActivity() {
                 .create()
 
             builder.show()
+        }
+    }
+
+    private val onNewChannel = Emitter.Listener { args ->
+        runOnUiThread {
+            val channelName = args[0] as String
+            val channelDesc = args[1] as String
+            val channelId = args[2] as String
+
+            val newChannel = Channel(channelName, channelDesc, channelId)
+            MessageService.channels.add(newChannel)
+            println(newChannel.name)
+            println(newChannel.description)
+            println(newChannel.id)
         }
     }
 
