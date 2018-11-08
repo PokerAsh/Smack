@@ -29,7 +29,7 @@
                      android:id="@+id/nav_drawer_header_inclue"/>
 
             <ListView
-                    android:id="@+id/chanel_list"
+                    android:id="@+id/channel_list"
                     android:layout_below="@+id/nav_drawer_header_inclue"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
