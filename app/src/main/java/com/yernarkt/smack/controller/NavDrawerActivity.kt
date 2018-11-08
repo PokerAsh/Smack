@@ -18,6 +18,7 @@ import android.widget.EditText
 import com.yernarkt.smack.BaseApplication
 import com.yernarkt.smack.R
 import com.yernarkt.smack.model.Channel
+import com.yernarkt.smack.model.Message
 import com.yernarkt.smack.util.BROADCAST_USER_DATA_CHANGE
 import com.yernarkt.smack.util.SOCKET_URL
 import com.yernarkt.smack.vnetwork.AuthService
@@ -46,6 +47,7 @@ class NavDrawerActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         socket.connect()
         socket.on("channelCreated", onNewChannel)
+        socket.on("messageCreated", onNewMessage)
 
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, toolbar,
@@ -162,7 +164,37 @@ class NavDrawerActivity : AppCompatActivity() {
     }
 
     fun sendMessageBtnClick(view: View) {
-        hideSoftKeyboard()
+        if (BaseApplication.prefs.isLoggedIn && messageTextField.text.isNotEmpty() && selectedChannel != null) {
+            val userId = UserDataService.id
+            val channelId = selectedChannel!!.id
+            socket.emit(
+                "newMessage",
+                messageTextField.text.toString(),
+                userId,
+                channelId,
+                UserDataService.name,
+                UserDataService.avatarName,
+                UserDataService.avatarColor
+            )
+
+            messageTextField.text.clear()
+            hideSoftKeyboard()
+        }
+    }
+
+    private val onNewMessage = Emitter.Listener { args ->
+        runOnUiThread {
+            val msgBody = args[0] as String
+            val channelId = args[2] as String
+            val userName = args[3] as String
+            val userAvatar = args[4] as String
+            val userAvatarColor = args[5] as String
+            val id = args[6] as String
+            val timeStamp = args[7] as String
+
+            val newMessage = Message(msgBody, userName, channelId, userAvatar, userAvatarColor, id, timeStamp)
+            MessageService.messages.add(newMessage)
+        }
     }
 
     private fun hideSoftKeyboard() {
