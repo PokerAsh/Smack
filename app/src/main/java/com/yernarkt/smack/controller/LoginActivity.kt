@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.yernarkt.smack.R
-import com.yernarkt.smack.volley_network.AuthService
+import com.yernarkt.smack.vnetwork.AuthService
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {

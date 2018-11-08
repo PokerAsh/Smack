@@ -16,20 +16,21 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.yernarkt.smack.R
 import com.yernarkt.smack.util.BROADCAST_USER_DATA_CHANGE
-import com.yernarkt.smack.volley_network.AuthService
-import com.yernarkt.smack.volley_network.UserDataService
+import com.yernarkt.smack.util.SOCKET_URL
+import com.yernarkt.smack.vnetwork.AuthService
+import com.yernarkt.smack.vnetwork.UserDataService
+import io.socket.client.IO
 import kotlinx.android.synthetic.main.activity_nav_drawer.*
 import kotlinx.android.synthetic.main.app_bar_nav_drawer.*
 import kotlinx.android.synthetic.main.nav_header_nav_drawer.*
 
 class NavDrawerActivity : AppCompatActivity() {
+    val socket = IO.socket(SOCKET_URL)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav_drawer)
         setSupportActionBar(toolbar)
-
-        hideSoftKeyboard()
 
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, toolbar,
@@ -38,12 +39,26 @@ class NavDrawerActivity : AppCompatActivity() {
         )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
+    }
 
+    override fun onResume() {
         LocalBroadcastManager.getInstance(this).registerReceiver(
             userDataChangeReceiver, IntentFilter(
                 BROADCAST_USER_DATA_CHANGE
             )
         )
+        socket.connect()
+        super.onResume()
+    }
+
+    override fun onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChangeReceiver)
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        socket.disconnect()
+        super.onDestroy()
     }
 
     private val userDataChangeReceiver = object : BroadcastReceiver() {
@@ -86,7 +101,8 @@ class NavDrawerActivity : AppCompatActivity() {
 
                     val channelName = nameTextField.text.toString()
                     val channelDesc = descTextField.text.toString()
-                    hideSoftKeyboard()
+
+                    socket.emit("newChannel", channelName, channelDesc)
                 }
                 .setNegativeButton("Cancel") { dialog, which ->
                     hideSoftKeyboard()
@@ -98,7 +114,7 @@ class NavDrawerActivity : AppCompatActivity() {
     }
 
     fun sendMessageBtnClick(view: View) {
-
+        hideSoftKeyboard()
     }
 
     private fun hideSoftKeyboard() {

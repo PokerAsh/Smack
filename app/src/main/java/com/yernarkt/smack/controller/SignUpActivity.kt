@@ -12,7 +12,7 @@ import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
 import com.yernarkt.smack.R
 import com.yernarkt.smack.util.BROADCAST_USER_DATA_CHANGE
-import com.yernarkt.smack.volley_network.AuthService
+import com.yernarkt.smack.vnetwork.AuthService
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import java.util.*
 
@@ -41,9 +41,9 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun hideSoftKeyboard() {
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(createEmailText, InputMethodManager.SHOW_IMPLICIT)
-        imm.showSoftInput(createPasswordText, InputMethodManager.SHOW_IMPLICIT)
-        imm.showSoftInput(createUserNameText, InputMethodManager.SHOW_IMPLICIT)
+        if (imm.isAcceptingText) {
+            imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+        }
     }
 
     fun generateColorClick(view: View) {

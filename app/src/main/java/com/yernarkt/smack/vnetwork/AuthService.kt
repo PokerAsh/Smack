@@ -1,4 +1,4 @@
-package com.yernarkt.smack.volley_network
+package com.yernarkt.smack.vnetwork
 
 import android.content.Context
 import android.content.Intent
@@ -135,12 +135,12 @@ object AuthService {
                     UserDataService.avatarColor = response.getString("avatarColor")
                     UserDataService.id = response.getString("_id")
 
-                    val intent = Intent(BROADCAST_USER_DATA_CHANGE)
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
-
+                    val userDataChange = Intent(BROADCAST_USER_DATA_CHANGE)
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(userDataChange)
                     complete(true)
                 } catch (e: JSONException) {
                     Log.d("JSON", "EXC: ${e.localizedMessage}")
+                    complete(false)
                 }
             }, Response.ErrorListener { error ->
                 Log.d("ERROR", "Could not find user $error")

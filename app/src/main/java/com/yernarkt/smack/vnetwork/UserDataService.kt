@@ -1,4 +1,4 @@
-package com.yernarkt.smack.volley_network
+package com.yernarkt.smack.vnetwork
 
 import android.graphics.Color
 
@@ -18,13 +18,9 @@ object UserDataService {
 
         val spllitedDoubles = strippedColor.split(" ")
 
-        var r = 0
-        var g = 0
-        var b = 0
-
-        r = (spllitedDoubles[0].toDouble() * 255).toInt()
-        g = (spllitedDoubles[1].toDouble() * 255).toInt()
-        b = (spllitedDoubles[2].toDouble() * 255).toInt()
+        val r = (spllitedDoubles[0].toDouble() * 255).toInt()
+        val g = (spllitedDoubles[1].toDouble() * 255).toInt()
+        val b = (spllitedDoubles[2].toDouble() * 255).toInt()
 
         return Color.rgb(r, g, b)
     }
