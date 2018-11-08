@@ -23,25 +23,24 @@ class LoginActivity : AppCompatActivity() {
         val email = loginEmailText.text.toString()
         val password = loginPasswordText.text.toString()
 
-        AuthService.loginUser(this, email, password) { loginSuccess ->
-            if (loginSuccess) {
-                AuthService.findUserByEmail(this) { findSuccess ->
-                    enableProgressBar(false)
-
-                    if (findSuccess) {
-                        finish()
-                    } else {
-                        Snackbar.make(view, "Could not find user", Snackbar.LENGTH_LONG).show()
+        if (email.isNotEmpty() || password.isNotEmpty()) {
+            AuthService.loginUser(this, email, password) { loginSuccess ->
+                if (loginSuccess) {
+                    AuthService.findUserByEmail(this) { findSuccess ->
+                        if (findSuccess) {
+                            enableProgressBar(false)
+                            finish()
+                        } else {
+                            errorSnackBar(view)
+                        }
                     }
+                } else {
+                    errorSnackBar(view)
                 }
             }
+        } else {
+            Snackbar.make(view, "Please enter email and password", Snackbar.LENGTH_LONG).show()
         }
-    }
-
-    private fun hideSoftKeyboard() {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(loginEmailText, InputMethodManager.SHOW_IMPLICIT)
-        imm.showSoftInput(loginPasswordText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     fun loginCreateLoginBtnClick(view: View) {
@@ -50,6 +49,18 @@ class LoginActivity : AppCompatActivity() {
         val intent = Intent(this, SignUpActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    private fun errorSnackBar(view: View) {
+        enableProgressBar(false)
+        Snackbar.make(view, "Something went wrong. Please try again", Snackbar.LENGTH_LONG).show()
+    }
+
+    private fun hideSoftKeyboard() {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        if (imm.isAcceptingText) {
+            imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+        }
     }
 
     private fun enableProgressBar(enable: Boolean) {
