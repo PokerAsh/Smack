@@ -11,12 +11,14 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import com.yernarkt.smack.BaseApplication
 import com.yernarkt.smack.R
+import com.yernarkt.smack.adapter.MessagesAdapter
 import com.yernarkt.smack.model.Channel
 import com.yernarkt.smack.model.Message
 import com.yernarkt.smack.util.BROADCAST_USER_DATA_CHANGE
@@ -35,10 +37,16 @@ class NavDrawerActivity : AppCompatActivity() {
     val socket = IO.socket(SOCKET_URL)
     lateinit var channelAdapter: ArrayAdapter<Channel>
     var selectedChannel: Channel? = null
+    lateinit var messageAdapter: MessagesAdapter
 
     private fun setUpAdapter() {
         channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, MessageService.channels)
         channel_list.adapter = channelAdapter
+
+        messageAdapter = MessagesAdapter(this, MessageService.messages)
+        messageListView.adapter = messageAdapter
+        val manager = LinearLayoutManager(this)
+        messageListView.layoutManager = manager
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +76,8 @@ class NavDrawerActivity : AppCompatActivity() {
         if (BaseApplication.prefs.isLoggedIn) {
             AuthService.findUserByEmail(this) {}
         }
+
+
     }
 
     override fun onResume() {
@@ -110,11 +120,14 @@ class NavDrawerActivity : AppCompatActivity() {
 
     fun updateWithChannel() {
         mainChangelName.text = "#${selectedChannel?.name}"
-        //TODO download channel messages
-        if(selectedChannel != null){
-            MessageService.getMessages(selectedChannel!!.id){complete ->
-                if(complete){
+        if (selectedChannel != null) {
+            MessageService.getMessages(selectedChannel!!.id) { complete ->
+                if (complete) {
+                    messageAdapter.notifyDataSetChanged()
 
+                    if (messageAdapter.itemCount > 0) {
+                        messageListView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                    }
                 }
             }
         }
@@ -123,6 +136,8 @@ class NavDrawerActivity : AppCompatActivity() {
     fun loginBtnNavClicked(view: View) {
         if (BaseApplication.prefs.isLoggedIn) {
             UserDataService.logout()
+            channelAdapter.notifyDataSetChanged()
+            messageAdapter.notifyDataSetChanged()
             userNameNavHeader.text = ""
             userEmailNavHeader.text = ""
             userImageNavHeader.setImageResource(R.drawable.profiledefault)
@@ -185,6 +200,9 @@ class NavDrawerActivity : AppCompatActivity() {
 
                     val newMessage = Message(msgBody, userName, channelId, userAvatar, userAvatarColor, id, timeStamp)
                     MessageService.messages.add(newMessage)
+
+                    messageAdapter.notifyDataSetChanged()
+                    messageListView.smoothScrollToPosition(messageAdapter.itemCount - 1)
                 }
             }
     }
