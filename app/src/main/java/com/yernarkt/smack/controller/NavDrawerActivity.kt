@@ -9,8 +9,11 @@ import android.os.Bundle
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import com.yernarkt.smack.R
 import com.yernarkt.smack.util.BROADCAST_USER_DATA_CHANGE
 import com.yernarkt.smack.volley_network.AuthService
@@ -25,6 +28,8 @@ class NavDrawerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav_drawer)
         setSupportActionBar(toolbar)
+
+        hideSoftKeyboard()
 
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, toolbar,
@@ -70,11 +75,37 @@ class NavDrawerActivity : AppCompatActivity() {
     }
 
     fun addChannelBtnClick(view: View) {
+        if (AuthService.isLoggedIn) {
+            val dialogView = layoutInflater.inflate(R.layout.dialog_add_channel, null)
 
+            val builder = AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setPositiveButton("Create") { dialog, which ->
+                    val nameTextField = dialogView.findViewById<EditText>(R.id.addChannelNameTxt)
+                    val descTextField = dialogView.findViewById<EditText>(R.id.addChannelDescTxt)
+
+                    val channelName = nameTextField.text.toString()
+                    val channelDesc = descTextField.text.toString()
+                    hideSoftKeyboard()
+                }
+                .setNegativeButton("Cancel") { dialog, which ->
+                    hideSoftKeyboard()
+                }
+                .create()
+
+            builder.show()
+        }
     }
 
     fun sendMessageBtnClick(view: View) {
 
+    }
+
+    private fun hideSoftKeyboard() {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        if (imm.isAcceptingText) {
+            imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+        }
     }
 
     override fun onBackPressed() {
