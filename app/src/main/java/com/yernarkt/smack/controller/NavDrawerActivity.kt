@@ -27,11 +27,13 @@ import io.socket.client.IO
 import io.socket.emitter.Emitter
 import kotlinx.android.synthetic.main.activity_nav_drawer.*
 import kotlinx.android.synthetic.main.app_bar_nav_drawer.*
+import kotlinx.android.synthetic.main.content_nav_drawer.*
 import kotlinx.android.synthetic.main.nav_header_nav_drawer.*
 
 class NavDrawerActivity : AppCompatActivity() {
     val socket = IO.socket(SOCKET_URL)
     lateinit var channelAdapter: ArrayAdapter<Channel>
+    var selectedChannel: Channel? = null
 
     private fun setUpAdapter() {
         channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, MessageService.channels)
@@ -54,6 +56,12 @@ class NavDrawerActivity : AppCompatActivity() {
         toggle.syncState()
 
         setUpAdapter()
+
+        channel_list.setOnItemClickListener { _, _, i, _ ->
+            selectedChannel = MessageService.channels[i]
+            drawer_layout.closeDrawer(GravityCompat.START)
+            updateWithChannel()
+        }
 
         if (BaseApplication.prefs.isLoggedIn) {
             AuthService.findUserByEmail(this) {}
@@ -85,13 +93,22 @@ class NavDrawerActivity : AppCompatActivity() {
                 userImageNavHeader.setBackgroundColor(UserDataService.returnAvatarColor(UserDataService.avatarColor))
                 loginBtnNavHeader.text = "Logout"
 
-                MessageService.getChannels(context) { complete ->
+                MessageService.getChannels { complete ->
                     if (complete) {
-                        channelAdapter.notifyDataSetChanged()
+                        if (MessageService.channels.count() > 0) {
+                            selectedChannel = MessageService.channels[0]
+                            channelAdapter.notifyDataSetChanged()
+                            updateWithChannel()
+                        }
                     }
                 }
             }
         }
+    }
+
+    fun updateWithChannel() {
+        mainChangelName.text = "#${selectedChannel?.name}"
+        //TODO download channel messages
     }
 
     fun loginBtnNavClicked(view: View) {
@@ -114,7 +131,7 @@ class NavDrawerActivity : AppCompatActivity() {
 
             val builder = AlertDialog.Builder(this)
                 .setView(dialogView)
-                .setPositiveButton("Create") { dialog, which ->
+                .setPositiveButton("Create") { _, _ ->
                     val nameTextField = dialogView.findViewById<EditText>(R.id.addChannelNameTxt)
                     val descTextField = dialogView.findViewById<EditText>(R.id.addChannelDescTxt)
 
@@ -123,7 +140,7 @@ class NavDrawerActivity : AppCompatActivity() {
 
                     socket.emit("newChannel", channelName, channelDesc)
                 }
-                .setNegativeButton("Cancel") { dialog, which ->
+                .setNegativeButton("Cancel") { _, _ ->
                     hideSoftKeyboard()
                 }
                 .create()

@@ -2,6 +2,7 @@ package com.yernarkt.smack.vnetwork
 
 import android.content.Context
 import android.content.Intent
+import android.support.design.widget.Snackbar
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import android.widget.Toast
@@ -15,11 +16,7 @@ import org.json.JSONException
 import org.json.JSONObject
 
 object AuthService {
-//    var isLoggedIn = false
-//    var userEmail = ""
-//    var authToken = ""
-
-    fun registerUser(context: Context, email: String, password: String, complete: (Boolean) -> Unit) {
+    fun registerUser(email: String, password: String, complete: (Boolean) -> Unit) {
         val jsonBody = JSONObject()
         jsonBody.put("email", email)
         jsonBody.put("password", password)
@@ -43,7 +40,7 @@ object AuthService {
         BaseApplication.prefs.requestQueue.add(registerRequest)
     }
 
-    fun loginUser(context: Context, email: String, password: String, complete: (Boolean) -> Unit) {
+    fun loginUser(email: String, password: String, complete: (Boolean) -> Unit) {
         val jsonBody = JSONObject()
         jsonBody.put("email", email)
         jsonBody.put("password", password)
@@ -56,7 +53,7 @@ object AuthService {
                 BaseApplication.prefs.isLoggedIn = true
                 complete(true)
             } catch (e: JSONException) {
-                Toast.makeText(context, "EXE: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                Log.d("ERROR", "EXC ${e.localizedMessage}")
                 complete(false)
             }
         }, Response.ErrorListener { error ->
@@ -76,7 +73,6 @@ object AuthService {
     }
 
     fun createUser(
-        context: Context,
         name: String,
         email: String,
         avatarName: String,
@@ -100,7 +96,7 @@ object AuthService {
                     UserDataService.id = response.getString("_id")
                     complete(true)
                 } catch (e: JSONException) {
-                    Toast.makeText(context, "EXE: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                    Log.d("ERROR", "EXC ${e.localizedMessage}")
                     complete(false)
                 }
             }, Response.ErrorListener { error ->
