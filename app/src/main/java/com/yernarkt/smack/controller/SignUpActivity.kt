@@ -7,8 +7,9 @@ import android.support.design.widget.Snackbar
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.view.View.GONE
+import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
+import android.view.inputmethod.InputMethodManager
 import com.yernarkt.smack.R
 import com.yernarkt.smack.util.BROADCAST_USER_DATA_CHANGE
 import com.yernarkt.smack.volley_network.AuthService
@@ -27,6 +28,7 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     fun generateUserAvatar(view: View) {
+        hideSoftKeyboard()
         val random = Random()
         val color = random.nextInt(2)
         val avatar = random.nextInt(28)
@@ -35,6 +37,13 @@ class SignUpActivity : AppCompatActivity() {
         val resourceId = resources.getIdentifier(userAvatar, "drawable", packageName)
 
         createAvatarImageView.setImageResource(resourceId)
+    }
+
+    private fun hideSoftKeyboard() {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(createEmailText, InputMethodManager.SHOW_IMPLICIT)
+        imm.showSoftInput(createPasswordText, InputMethodManager.SHOW_IMPLICIT)
+        imm.showSoftInput(createUserNameText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     fun generateColorClick(view: View) {
@@ -46,13 +55,15 @@ class SignUpActivity : AppCompatActivity() {
         createAvatarImageView.setBackgroundColor(Color.rgb(r, g, b))
 
         val savedR = r.toDouble() / 255
-        val savedG = r.toDouble() / 255
-        val savedB = r.toDouble() / 255
+        val savedG = g.toDouble() / 255
+        val savedB = b.toDouble() / 255
 
         avatarColor = "[$savedR, $savedG, $savedB, 1]"
+        hideSoftKeyboard()
     }
 
     fun createUserBtnClick(view: View) {
+        hideSoftKeyboard()
         enableProgressBar(true)
         val userName = createUserNameText.text.toString()
         val email = createEmailText.text.toString()
@@ -100,7 +111,7 @@ class SignUpActivity : AppCompatActivity() {
         if (enable) {
             createPb.visibility = VISIBLE
         } else {
-            createPb.visibility = GONE
+            createPb.visibility = INVISIBLE
         }
 
         createUserBtn.isEnabled = !enable

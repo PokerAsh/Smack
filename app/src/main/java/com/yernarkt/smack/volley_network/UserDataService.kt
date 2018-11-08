@@ -1,7 +1,6 @@
 package com.yernarkt.smack.volley_network
 
 import android.graphics.Color
-import java.util.*
 
 object UserDataService {
     var id = ""
@@ -17,24 +16,20 @@ object UserDataService {
                 .replace("]", "")
                 .replace(",", "")
 
-//        val spllitedDoubles = strippedColor.split(" ")
+        val spllitedDoubles = strippedColor.split(" ")
 
         var r = 0
         var g = 0
         var b = 0
 
-        val scanner = Scanner(strippedColor)
-
-        if (scanner.hasNext()) {
-            r = (scanner.nextDouble() * 255).toInt()
-            g = (scanner.nextDouble() * 255).toInt()
-            b = (scanner.nextDouble() * 255).toInt()
-        }
+        r = (spllitedDoubles[0].toDouble() * 255).toInt()
+        g = (spllitedDoubles[1].toDouble() * 255).toInt()
+        b = (spllitedDoubles[2].toDouble() * 255).toInt()
 
         return Color.rgb(r, g, b)
     }
 
-    fun logout(){
+    fun logout() {
         id = ""
         avatarColor = ""
         avatarName = ""
