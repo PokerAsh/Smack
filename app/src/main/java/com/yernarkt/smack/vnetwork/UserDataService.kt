@@ -1,6 +1,7 @@
 package com.yernarkt.smack.vnetwork
 
 import android.graphics.Color
+import com.yernarkt.smack.BaseApplication
 
 object UserDataService {
     var id = ""
@@ -31,8 +32,8 @@ object UserDataService {
         avatarName = ""
         email = ""
         name = ""
-        AuthService.authToken = ""
-        AuthService.userEmail = ""
-        AuthService.isLoggedIn = false
+        BaseApplication.prefs.authToken = ""
+        BaseApplication.prefs.userEmail = ""
+        BaseApplication.prefs.isLoggedIn = false
     }
 }

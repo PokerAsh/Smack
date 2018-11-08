@@ -15,6 +15,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import com.yernarkt.smack.BaseApplication
 import com.yernarkt.smack.R
 import com.yernarkt.smack.model.Channel
 import com.yernarkt.smack.util.BROADCAST_USER_DATA_CHANGE
@@ -32,7 +33,7 @@ class NavDrawerActivity : AppCompatActivity() {
     val socket = IO.socket(SOCKET_URL)
     lateinit var channelAdapter: ArrayAdapter<Channel>
 
-    private fun setUpAdapter(){
+    private fun setUpAdapter() {
         channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, MessageService.channels)
         channel_list.adapter = channelAdapter
     }
@@ -52,8 +53,11 @@ class NavDrawerActivity : AppCompatActivity() {
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
-
         setUpAdapter()
+
+        if (BaseApplication.prefs.isLoggedIn) {
+            AuthService.findUserByEmail(this) {}
+        }
     }
 
     override fun onResume() {
@@ -73,7 +77,7 @@ class NavDrawerActivity : AppCompatActivity() {
 
     private val userDataChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (AuthService.isLoggedIn) {
+            if (BaseApplication.prefs.isLoggedIn) {
                 userNameNavHeader.text = UserDataService.name
                 userEmailNavHeader.text = UserDataService.email
                 val resourseId = resources.getIdentifier(UserDataService.avatarName, "drawable", packageName)
@@ -81,8 +85,8 @@ class NavDrawerActivity : AppCompatActivity() {
                 userImageNavHeader.setBackgroundColor(UserDataService.returnAvatarColor(UserDataService.avatarColor))
                 loginBtnNavHeader.text = "Logout"
 
-                MessageService.getChannels(context){complete ->
-                    if(complete){
+                MessageService.getChannels(context) { complete ->
+                    if (complete) {
                         channelAdapter.notifyDataSetChanged()
                     }
                 }
@@ -91,7 +95,7 @@ class NavDrawerActivity : AppCompatActivity() {
     }
 
     fun loginBtnNavClicked(view: View) {
-        if (AuthService.isLoggedIn) {
+        if (BaseApplication.prefs.isLoggedIn) {
             UserDataService.logout()
             userNameNavHeader.text = ""
             userEmailNavHeader.text = ""
@@ -105,7 +109,7 @@ class NavDrawerActivity : AppCompatActivity() {
     }
 
     fun addChannelBtnClick(view: View) {
-        if (AuthService.isLoggedIn) {
+        if (BaseApplication.prefs.isLoggedIn) {
             val dialogView = layoutInflater.inflate(R.layout.dialog_add_channel, null)
 
             val builder = AlertDialog.Builder(this)
